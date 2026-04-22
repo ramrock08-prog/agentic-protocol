@@ -120,7 +120,7 @@
             document.getElementById('download-btn').classList.add('hidden');
 
             try {
-                const res = await fetch("http://localhost:8000/broadcast", {
+                const res = await fetch("https://agentic-api-wl7k.onrender.com", {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({prompt: basePrompt, step: "init"})
                 });
@@ -148,7 +148,7 @@
 
             const finalPrompt = `${basePrompt}. Requirement: Design it specifically using this style/feature: ${selectedOption}`;
             try {
-                const res = await fetch("http://localhost:8000/broadcast", {
+                const res = await fetch("https://agentic-api-wl7k.onrender.com", {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({prompt: finalPrompt, step: "execute"})
                 });
@@ -191,7 +191,7 @@
             document.getElementById('answer').innerHTML = "<div class='animate-pulse text-emerald-400'>Agent querying global opportunity databases...</div>";
 
             try {
-                const res = await fetch("http://localhost:8000/broadcast", {
+                const res = await fetch("https://agentic-api-wl7k.onrender.com", {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({prompt: jobPrompt, step: "career_scan", context: resumeContext})
                 });
@@ -234,7 +234,7 @@ async function applyCareer(title, company) {
             const applyPrompt = `Apply for the role of '${title}' at '${company}'. Write a highly persuasive application/cover letter representing the user. Format the output as a 'Successful Submission Receipt' including the generated cover letter.`;
 
             try {
-                const res = await fetch("http://localhost:8000/broadcast", {
+                const res = await fetch("https://agentic-api-wl7k.onrender.com", {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({prompt: applyPrompt, step: "execute", context: resumeContext})
                 });
