@@ -8,13 +8,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+
 app = FastAPI()
 
+# THIS IS REQUIRED FOR VERCEL TO TALK TO RENDER
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all websites to connect
+    allow_origins=["*"], 
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods (POST, GET, etc.)
+    allow_methods=["*"], 
     allow_headers=["*"],
 )
 
