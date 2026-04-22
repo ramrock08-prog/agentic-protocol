@@ -10,7 +10,13 @@ load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 app = FastAPI()
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all websites to connect
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (POST, GET, etc.)
+    allow_headers=["*"],
+)
 
 WALLET_BALANCE = 10.00
 
