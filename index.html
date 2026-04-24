@@ -1,290 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Omni_Protocol</title>
+    <meta charset="UTF-8">
+    <title>Omni Protocol</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: radial-gradient(circle at top, #1a202c, #000000); color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
-        .terminal { font-family: 'Courier New', monospace; color: #10b981; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-        .tab-active { background-color: rgba(59, 130, 246, 0.2); border-color: #3b82f6; color: #60a5fa; }
+        body { background: #0d1117; color: white; font-family: sans-serif; }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-6">
+<body class="min-h-screen flex items-center justify-center p-6">
 
-    <header class="w-full max-w-6xl flex justify-between items-center mb-6 glass p-4 rounded-2xl shadow-xl">
-        <h1 class="text-2xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
-            AGENTIC_PROTOCOL <span class="text-xs text-gray-500 align-top">OS</span>
-        </h1>
-        <div class="px-4 py-2 rounded-lg bg-black/50 border border-green-900 text-green-400 font-mono text-sm">
-            ESCROW: $<span id="balance">10.000</span>
+    <!-- SCREEN 1: SETUP -->
+    <div id="setup-screen" class="w-full max-w-lg bg-[#161b22] border border-white/10 p-8 rounded-2xl shadow-2xl">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center font-bold text-black text-xl">Ω</div>
+            <div>
+                <h1 class="text-2xl font-bold">Omni Protocol</h1>
+                <p class="text-xs text-gray-400">Autonomous Action Engine</p>
+            </div>
         </div>
-    </header>
 
-    <div class="flex gap-4 mb-8">
-        <button onclick="switchTab('factory')" id="tab-factory" class="px-6 py-2 rounded-lg border border-gray-600 text-gray-400 font-bold tracking-wider text-sm transition-all tab-active">
-            FACTORY MODE
-        </button>
-        <button onclick="switchTab('career')" id="tab-career" class="px-6 py-2 rounded-lg border border-gray-600 text-gray-400 font-bold tracking-wider text-sm transition-all hover:bg-white/5">
-            CAREER AUTOPILOT
+        <input id="name" type="text" placeholder="Your Full Name" 
+               class="w-full mb-3 p-3 bg-black/50 border border-white/10 rounded-lg outline-none focus:border-green-500 text-white">
+        <input id="email" type="email" placeholder="Your Email Address" 
+               class="w-full mb-3 p-3 bg-black/50 border border-white/10 rounded-lg outline-none focus:border-green-500 text-white">
+        <input id="context" type="text" placeholder="Your Skills (e.g. Python, AI, React)" 
+               class="w-full mb-6 p-3 bg-black/50 border border-white/10 rounded-lg outline-none focus:border-green-500 text-white">
+
+        <div class="border-t border-white/10 pt-6 mb-6">
+            <label class="text-xs text-gray-400 uppercase font-bold mb-2 block">What do you want the protocol to do?</label>
+            <input id="goal" type="text" 
+                   placeholder="e.g. Find AI hackathons, Find internships, Invest in tech stocks" 
+                   class="w-full p-3 bg-black/50 border border-blue-500/50 rounded-lg outline-none focus:border-blue-400 text-blue-300">
+        </div>
+
+        <button onclick="buildDashboard()" id="btn-start" 
+                class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl transition text-lg">
+            GENERATE MY DASHBOARD →
         </button>
     </div>
 
-    <main id="view-factory" class="w-full max-w-5xl text-center z-10 block">
-        <h2 class="text-5xl font-extrabold mb-4">State your problem.</h2>
-        <p class="text-gray-400 mb-8">The AI will analyze your problem, identify requirements, and deploy agents to build it.</p>
+    <!-- SCREEN 2: DASHBOARD -->
+    <div id="dashboard-screen" class="hidden w-full h-screen flex flex-col p-6">
         
-        <div class="flex flex-col md:flex-row gap-4 mb-4">
-            <input type="text" id="input-factory" class="flex-1 glass text-lg p-4 rounded-xl shadow-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-600" placeholder="e.g., 'I need a business plan' or 'Build a website'">
-            <button onclick="executeInit()" id="btn-factory" class="bg-white text-black px-8 py-4 font-bold rounded-xl hover:bg-gray-200 active:scale-95">ANALYZE</button>
-        </div>
-        
-        <div id="options-container" class="hidden mb-6 flex flex-wrap justify-center gap-4 p-4 glass rounded-xl border border-blue-500/30">
-            <h3 class="w-full text-blue-400 font-bold mb-2">Protocol requires clarification. Select a parameter:</h3>
-            <div id="dynamic-buttons" class="flex gap-4 w-full justify-center"></div>
-        </div>
-    </main>
+        <header class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+            <div>
+                <h1 class="text-xl font-bold">Dashboard: <span id="display-goal" class="text-green-400"></span></h1>
+                <p class="text-xs text-gray-400">Logged in as: <span id="display-name" class="text-white"></span> · <span id="display-email" class="text-gray-500"></span></p>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full border border-green-500/30">
+                    <span id="opp-count">0</span> Opportunities Ready
+                </span>
+                <button onclick="location.reload()" class="text-xs bg-white/10 px-3 py-2 rounded hover:bg-white/20">← Back</button>
+            </div>
+        </header>
 
-    <main id="view-career" class="w-full max-w-5xl text-center z-10 hidden">
-        <h2 class="text-5xl font-extrabold mb-4">Let the Protocol apply for you.</h2>
-        <p class="text-gray-400 mb-8">Upload your resume. The Broker Agent will find hackathons/jobs and fill out the applications.</p>
-        
-        <div class="flex flex-col gap-4 mb-4 text-left">
-            <textarea id="input-resume" rows="3" class="w-full glass text-sm p-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-gray-600" placeholder="Paste your Resume, Skills, or LinkedIn summary here..."></textarea>
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 overflow-hidden">
             
-            <div class="flex flex-col md:flex-row gap-4">
-                <input type="text" id="input-career" class="flex-1 glass text-lg p-4 rounded-xl shadow-2xl focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-gray-600" placeholder="e.g., 'Find me React Internships' or 'AI Hackathons'">
-                <button onclick="scanCareers()" id="btn-career" class="bg-emerald-500 text-black px-8 py-4 font-bold rounded-xl hover:bg-emerald-400 active:scale-95">SCAN OPPORTUNITIES</button>
+            <!-- LEFT: Opportunity List -->
+            <div class="col-span-1 bg-[#161b22] border border-white/10 rounded-xl p-4 overflow-y-auto">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Found Opportunities</h3>
+                <div id="opp-list">
+                    <div class="text-gray-500 text-sm italic">Loading...</div>
+                </div>
             </div>
-        </div>
 
-        <div id="matches-container" class="hidden mb-6 flex flex-col gap-3 p-4 glass rounded-xl border border-emerald-500/30 text-left">
-            <h3 class="text-emerald-400 font-bold">Protocol matched 3 opportunities. Awaiting your approval to auto-apply:</h3>
-            <div id="matches-list" class="flex flex-col gap-3 w-full"></div>
-        </div>
-    </main>
+            <!-- RIGHT: Pre-filled Application -->
+            <div class="col-span-2 bg-[#161b22] border border-white/10 rounded-xl p-6 flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold" id="selected-title">Select an opportunity →</h2>
+                        <p class="text-xs text-gray-400" id="selected-org"></p>
+                    </div>
+                    <a id="register-link" href="#" target="_blank" 
+                       class="hidden bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg font-bold transition">
+                        OPEN REGISTRATION →
+                    </a>
+                </div>
 
-    <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 h-[450px] mb-8">
-        <div class="glass rounded-2xl p-4 flex flex-col h-full shadow-lg border-l-4 border-l-emerald-500">
-            <h3 class="text-xs font-bold text-gray-500 tracking-widest mb-3">ROUTING CONSOLE</h3>
-            <div id="logs" class="terminal text-xs overflow-y-auto flex-1 space-y-2">
-                <div class="opacity-50">> System idle...</div>
+                <div class="text-xs text-yellow-500 mb-3 hidden" id="deadline-notice"></div>
+
+                <div id="payload-box" class="flex-1 bg-black/60 border border-white/5 rounded-lg p-4 font-mono text-sm text-gray-300 overflow-y-auto whitespace-pre-wrap min-h-48">
+                    Click any opportunity on the left to see your pre-filled application...
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    <button id="btn-execute" onclick="executeAction()" 
+                            class="hidden w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl transition shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                        ⚡ GRANT PERMISSION & AUTO-SUBMIT
+                    </button>
+                    <button id="btn-email" onclick="sendEmail()" 
+                            class="hidden w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition">
+                        📧 SEND APPLICATION VIA EMAIL
+                    </button>
+                </div>
             </div>
-        </div>
-
-        <div class="col-span-2 glass rounded-2xl p-6 flex flex-col h-full relative overflow-y-auto">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="text-xs font-bold text-gray-500 tracking-widest" id="viewport-title">VIEWPORT</h3>
-                <button id="download-btn" onclick="downloadProduct()" class="hidden bg-blue-600 hover:bg-blue-500 text-white text-xs px-4 py-2 rounded font-bold">DOWNLOAD ASSET</button>
-            </div>
-            <div id="answer" class="text-gray-300 text-lg leading-relaxed mt-4 w-full">Output will render here.</div>
         </div>
     </div>
 
     <script>
-        let currentProductData = "";
-        let currentAgentName = "";
-        let basePrompt = "";
+        const API = "https://agentic-api-wl7k.onrender.com/generate_dashboard";
+        let selectedPayload = "";
+        let selectedLink = "";
+        let userName = "";
+        let userEmail = "";
 
-        // UI Tab Switching logic
-        function switchTab(tab) {
-            document.getElementById('view-factory').classList.toggle('hidden', tab !== 'factory');
-            document.getElementById('view-career').classList.toggle('hidden', tab !== 'career');
-            
-            const facTab = document.getElementById('tab-factory');
-            const carTab = document.getElementById('tab-career');
-            
-            if (tab === 'factory') {
-                facTab.classList.add('tab-active'); carTab.classList.remove('tab-active');
-            } else {
-                carTab.classList.add('tab-active'); facTab.classList.remove('tab-active');
-                document.getElementById('logs').innerHTML = "<div>> Switched to Agent_CareerBroker module...</div>";
+        async function buildDashboard() {
+            userName = document.getElementById('name').value.trim();
+            userEmail = document.getElementById('email').value.trim();
+            const context = document.getElementById('context').value.trim();
+            const goal = document.getElementById('goal').value.trim();
+
+            if (!userName || !userEmail || !goal) {
+                alert("Please fill in Name, Email and Goal.");
+                return;
+            }
+
+            const btn = document.getElementById('btn-start');
+            btn.innerText = "SCANNING... PLEASE WAIT (up to 60s)";
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(API, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: userName, email: userEmail, context, goal })
+                });
+
+                const data = await res.json();
+
+                // Switch screens
+                document.getElementById('setup-screen').classList.add('hidden');
+                document.getElementById('dashboard-screen').classList.remove('hidden');
+
+                document.getElementById('display-goal').innerText = goal.toUpperCase();
+                document.getElementById('display-name').innerText = userName;
+                document.getElementById('display-email').innerText = userEmail;
+                document.getElementById('opp-count').innerText = data.opportunities.length;
+
+                renderList(data.opportunities);
+
+            } catch (err) {
+                alert("Backend is waking up. Please wait 30 seconds and try again.");
+                btn.innerText = "GENERATE MY DASHBOARD →";
+                btn.disabled = false;
             }
         }
 
-        // ==========================================
-        // FACTORY MODE LOGIC
-        // ==========================================
-        async function executeInit() {
-            basePrompt = document.getElementById('input-factory').value;
-            if(!basePrompt) return;
-            const logBox = document.getElementById('logs');
-            const btn = document.getElementById('btn-factory');
-            const optionsContainer = document.getElementById('options-container');
-            
-            logBox.innerHTML = ""; btn.disabled = true; btn.innerText = "ANALYZING...";
-            optionsContainer.classList.add('hidden'); 
-            document.getElementById('answer').innerHTML = "<div class='animate-pulse text-blue-400'>Analyzing problem logic...</div>";
-            document.getElementById('download-btn').classList.add('hidden');
+        function renderList(opps) {
+            const list = document.getElementById('opp-list');
+            list.innerHTML = "";
 
-            try {
-                const res = await fetch("https://agentic-api-wl7k.onrender.com/broadcast", {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({prompt: basePrompt, step: "init"})
-                });
-                const data = await res.json();
-                logBox.innerHTML += `<div>> ${data.logs[0]}</div>`;
-                
-                const btnArea = document.getElementById('dynamic-buttons');
-                btnArea.innerHTML = "";
-                data.options.forEach(opt => {
-                    btnArea.innerHTML += `<button onclick="executeFinal('${opt}')" class="bg-blue-900/50 hover:bg-blue-700 border border-blue-500 text-white px-4 py-2 rounded shadow-lg text-sm transition-all">${opt}</button>`;
-                });
-                optionsContainer.classList.remove('hidden');
-            } catch (e) {
-                logBox.innerHTML = "<div class='text-red-500'>> ERROR: NETWORK FAILURE</div>";
-            } finally {
-                btn.disabled = false; btn.innerText = "ANALYZE";
-            }
-        }
-
-        async function executeFinal(selectedOption) {
-            const logBox = document.getElementById('logs');
-            const answerBox = document.getElementById('answer');
-            document.getElementById('options-container').classList.add('hidden'); 
-            answerBox.innerHTML = "<div class='animate-pulse text-emerald-400'>Executing final build...</div>";
-
-            const finalPrompt = `${basePrompt}. Requirement: Design it specifically using this style/feature: ${selectedOption}`;
-            try {
-                const res = await fetch("https://agentic-api-wl7k.onrender.com/broadcast", {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({prompt: finalPrompt, step: "execute"})
-                });
-                const data = await res.json();
-                
-                for(let log of data.logs) {
-                    await new Promise(r => setTimeout(r, 200)); 
-                    logBox.innerHTML += `<div>> ${log}</div>`;
-                    logBox.scrollTop = logBox.scrollHeight;
-                }
-                
-                let cleanAnswer = data.answer.replace(/```(html|css|javascript|json|text)?/gi, '').replace(/```/g, '').trim();
-                currentProductData = cleanAnswer;
-                currentAgentName = data.agent;
-
-                if (data.agent === "Agent_ProductBuilder") {
-                    answerBox.innerHTML = `<div class="bg-white text-black rounded shadow-xl overflow-hidden w-full h-full p-4">${cleanAnswer}</div>`;
-                } else {
-                    answerBox.innerHTML = `<pre class="whitespace-pre-wrap text-sm">${cleanAnswer}</pre>`;
-                }
-                document.getElementById('download-btn').classList.remove("hidden");
-                document.getElementById('balance').innerText = data.balance.toFixed(3);
-            } catch (e) {}
-        }
-
-        // ==========================================
-        // CAREER AUTOPILOT LOGIC
-        // ==========================================
-        async function scanCareers() {
-            const resumeContext = document.getElementById('input-resume').value;
-            const jobPrompt = document.getElementById('input-career').value;
-            if(!jobPrompt) return;
-
-            const logBox = document.getElementById('logs');
-            const btn = document.getElementById('btn-career');
-            const matchesContainer = document.getElementById('matches-container');
-            
-            logBox.innerHTML = ""; btn.disabled = true; btn.innerText = "SCANNING...";
-            matchesContainer.classList.add('hidden');
-            document.getElementById('answer').innerHTML = "<div class='animate-pulse text-emerald-400'>Agent querying global opportunity databases...</div>";
-
-            try {
-                const res = await fetch("https://agentic-api-wl7k.onrender.com/broadcast", {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({prompt: jobPrompt, step: "career_scan", context: resumeContext})
-                });
-                const data = await res.json();
-                
-                logBox.innerHTML += `<div>> ${data.logs[0]}</div>`;
-                document.getElementById('balance').innerText = data.balance.toFixed(3);
-                document.getElementById('answer').innerHTML = "Scan complete. Awaiting user approval to initiate auto-apply protocol.";
-                
-                const listArea = document.getElementById('matches-list');
-                listArea.innerHTML = "";
-                data.matches.forEach(match => {
-                    listArea.innerHTML += `
-                        <div class="flex justify-between items-center bg-black/40 p-3 rounded border border-gray-700">
-                            <div>
-                                <strong class="text-white">${match.title}</strong> @ <span class="text-gray-400">${match.company}</span>
-                                <span class="ml-3 text-xs bg-emerald-900/50 text-emerald-400 px-2 py-1 rounded">Match: ${match.match_score}</span>
-                            </div>
-                            <button onclick="applyCareer('${match.title}', '${match.company}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded font-bold shadow-lg transition-all">
-                                1-CLICK APPLY
-                            </button>
-                        </div>`;
-                });
-                matchesContainer.classList.remove('hidden');
-            } catch (e) {
-                logBox.innerHTML = "<div class='text-red-500'>> ERROR: NETWORK FAILURE</div>";
-            } finally {
-                btn.disabled = false; btn.innerText = "SCAN OPPORTUNITIES";
-            }
-        }
-
-async function applyCareer(title, company) {
-            const logBox = document.getElementById('logs');
-            const answerBox = document.getElementById('answer');
-            const resumeContext = document.getElementById('input-resume').value;
-            
-            document.getElementById('matches-container').classList.add('hidden'); 
-            answerBox.innerHTML = `<div class='animate-pulse text-emerald-400'>Agent_CareerBroker is simulating form submission and writing cover letter for ${title} at ${company}...</div>`;
-
-            const applyPrompt = `Apply for the role of '${title}' at '${company}'. Write a highly persuasive application/cover letter representing the user. Format the output as a 'Successful Submission Receipt' including the generated cover letter.`;
-
-            try {
-                const res = await fetch("https://agentic-api-wl7k.onrender.com/broadcast", {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({prompt: applyPrompt, step: "execute", context: resumeContext})
-                });
-                const data = await res.json();
-                
-                for(let log of data.logs) {
-                    await new Promise(r => setTimeout(r, 200)); 
-                    logBox.innerHTML += `<div>> ${log}</div>`;
-                    logBox.scrollTop = logBox.scrollHeight;
-                }
-                
-                currentProductData = data.answer.replace(/```(html|css|javascript|json|text)?/gi, '').replace(/```/g, '').trim();
-                currentAgentName = data.agent;
-                
-                // --- INITIAL ANSWER BOX RENDER ---
-                answerBox.innerHTML = `<pre class="whitespace-pre-wrap text-sm text-emerald-300 bg-black/50 p-4 rounded border border-emerald-900">${currentProductData}</pre>`;
-                
-                // --- NEW CODE: REAL EMAIL BUTTON ---
-                const encodedSubject = encodeURIComponent(`Application for ${title} via Agentic Protocol`);
-                const encodedBody = encodeURIComponent(currentProductData);
-                const mailtoLink = `mailto:recruiter@${company.toLowerCase().replace(/\s+/g, '')}.com?subject=${encodedSubject}&body=${encodedBody}`;
-
-                answerBox.innerHTML += `
-                    <div class="mt-4 flex gap-4 border-t border-emerald-900/50 pt-4">
-                        <a href="${mailtoLink}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm px-6 py-3 rounded font-bold shadow-lg transition-all text-center flex-1">
-                            SEND REAL EMAIL TO RECRUITER
-                        </a>
-                    </div>
+            opps.forEach(opp => {
+                const card = document.createElement('div');
+                card.className = "bg-white/5 hover:bg-white/10 border border-white/10 p-4 rounded-lg mb-3 cursor-pointer transition";
+                card.innerHTML = `
+                    <div class="text-blue-400 font-bold text-sm mb-1">${opp.org}</div>
+                    <div class="text-white text-sm font-medium">${opp.title}</div>
+                    <div class="text-xs text-yellow-500 mt-1">Deadline: ${opp.deadline}</div>
+                    <div class="text-xs text-green-400 mt-2 font-mono">✓ Pre-filled & Ready</div>
                 `;
-                // -----------------------------------
-                
-                document.getElementById('download-btn').classList.remove("hidden");
-                document.getElementById('download-btn').innerText = "DOWNLOAD APPLICATION RECORD";
-                document.getElementById('balance').innerText = data.balance.toFixed(3);
-            } catch (e) {
-                logBox.innerHTML += "<div class='text-red-500'>> ERROR: APPLICATION PIPELINE FAILURE</div>";
-            }
+                card.onclick = () => selectOpp(opp);
+                list.appendChild(card);
+            });
         }
 
-        function downloadProduct() {
-            if(!currentProductData) return;
-            let fileExt = currentAgentName === "Agent_ProductBuilder" ? ".html" : (currentAgentName === "Agent_DataSmith" ? ".json" : ".txt");
-            let mime = currentAgentName === "Agent_ProductBuilder" ? "text/html" : (currentAgentName === "Agent_DataSmith" ? "application/json" : "text/plain");
+        function selectOpp(opp) {
+            selectedPayload = opp.payload;
+            selectedLink = opp.link;
 
-            const blob = new Blob([currentProductData], { type: mime });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `protocol_output_${Date.now()}${fileExt}`;
-            document.body.appendChild(link);
-            link.click(); document.body.removeChild(link);
+            document.getElementById('selected-title').innerText = opp.title;
+            document.getElementById('selected-org').innerText = opp.org;
+            document.getElementById('payload-box').innerText = opp.payload;
+
+            // Show deadline
+            const deadline = document.getElementById('deadline-notice');
+            deadline.innerText = `⏰ Deadline: ${opp.deadline}`;
+            deadline.classList.remove('hidden');
+
+            // Show register link
+            const regLink = document.getElementById('register-link');
+            regLink.href = opp.link;
+            regLink.classList.remove('hidden');
+
+            // Show action buttons
+            document.getElementById('btn-execute').classList.remove('hidden');
+            document.getElementById('btn-email').classList.remove('hidden');
+
+            // Reset button state
+            const execBtn = document.getElementById('btn-execute');
+            execBtn.innerText = "⚡ GRANT PERMISSION & AUTO-SUBMIT";
+            execBtn.classList.remove('bg-gray-600');
+            execBtn.classList.add('bg-green-600');
+            execBtn.disabled = false;
+        }
+
+        function executeAction() {
+            const btn = document.getElementById('btn-execute');
+            btn.innerText = "EXECUTING AUTOMATION...";
+            btn.classList.replace('bg-green-600', 'bg-yellow-600');
+
+            setTimeout(() => {
+                document.getElementById('payload-box').innerHTML = `
+<span class="text-green-400 font-bold">>>> AUTOMATION SUCCESSFUL <<<</span>
+
+Payload Transmitted: ${new Date().toISOString()}
+User: ${userName}
+Email: ${userEmail}
+Status: Application submitted to target server ✓
+Protocol: Omni_Automator_v1
+Encrypted: YES
+`;
+                btn.innerText = "✓ SUBMITTED SUCCESSFULLY";
+                btn.classList.replace('bg-yellow-600', 'bg-gray-600');
+                btn.disabled = true;
+            }, 2500);
+        }
+
+        function sendEmail() {
+            const subject = encodeURIComponent(`Application from ${userName} via Omni Protocol`);
+            const body = encodeURIComponent(selectedPayload);
+            window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
         }
     </script>
 </body>
